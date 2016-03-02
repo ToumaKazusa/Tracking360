@@ -1,6 +1,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include <stdio.h>
+#include <opencv2/opencv.hpp>
 
 using namespace cv;
 using namespace std;
@@ -45,7 +46,7 @@ void Smoofimg (Mat M, int Range, int Width, int Height)
 	int i, j, i1, j1;
 	double sum;
 	int count;
-	Mat temp = M.clone; 
+	Mat temp = M.clone(); 
 	for(i = 0;i < Width;i ++)
 	{
 		for(j = 0;j < Height;j ++)
@@ -71,8 +72,8 @@ direction Cameramotion (Mat Previmg, Mat Currimg, int Width, int Height){
 	int i, j;
 	direction motion;
 	//Calculate x-motion of image 
-	sump = new int[Width];
-	sumc = new int[Width];
+	sump = new double[Width];
+	sumc = new double[Width];
 	for(i = 0; i < Width; i++)
 	{	
 		sump[i] = 0;
@@ -83,7 +84,7 @@ direction Cameramotion (Mat Previmg, Mat Currimg, int Width, int Height){
 			sumc[i] += Currimg.at<double>(j, i);;
 		}
 	}
-	diff = new int[321];
+	diff = new double[321];
 	//Assume moving is within [-160, 160]
 	//Smoof the difference and get delay
 	Smoof(sump, 10, Width);
@@ -111,8 +112,8 @@ direction Cameramotion (Mat Previmg, Mat Currimg, int Width, int Height){
 	//Calculate y-motion of image 
 	delete[] sump;
 	delete[] sumc;
-	sump = new int[Height];
-	sumc = new int[Height];
+	sump = new double[Height];
+	sumc = new double[Height];
 	for(i = 0; i < Height; i++)
 	{	
 		Pi = Previmg.ptr<double>(i);
@@ -126,7 +127,7 @@ direction Cameramotion (Mat Previmg, Mat Currimg, int Width, int Height){
 		}
 	}
 	delete[] diff;
-	diff = new int[241];
+	diff = new double[241];
 	//Assume moving is within [-120, 120]
 	//Smoof the difference and get delay
 	Smoof(sump, 10, Height);
@@ -156,7 +157,7 @@ direction Cameramotion (Mat Previmg, Mat Currimg, int Width, int Height){
 	return motion;	
 }
 
-degree Cameradegree ((Mat Previmg, Mat Currimg, int Height, int Width){
+degree Cameradegree (Mat Previmg, Mat Currimg, int Height, int Width){
 	direction motion = Cameramotion(Previmg, Currimg, Width, Height);
 	Smoofimg(Previmg, 5, Width, Height);
 	Smoofimg(Currimg, 5, Width, Height);
