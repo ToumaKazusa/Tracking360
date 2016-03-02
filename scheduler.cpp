@@ -128,15 +128,15 @@ bool ImgBuffer::PopImgBuff(Mat& buf)
              break;
         }
 
-        Mat imgHSV;
-        //Convert the captured frame from BGR to HSV
-        cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); 
+        //Mat imgHSV;
+        ////Convert the captured frame from BGR to HSV
+        //cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); 
 
-        buf.PushImgBuff(imgHSV);
-        buf.PopImgBuff(imgHSV);
+        buf.PushImgBuff(imgOriginal);
+        buf.PopImgBuff(imgOriginal);
         char img_name[50];
         sprintf(img_name, "img%d.jpg", i);
-        if(false == imwrite(img_name, imgHSV))
+        if(false == imwrite(img_name, imgOriginal))
         {
             fprintf(stderr, "image write failed\n");
         }
