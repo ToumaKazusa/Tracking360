@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 
 struct direction{
@@ -10,6 +11,7 @@ struct degree{
 	float hr;
 };
 
+//Smoof a continus array
 void Smoof (double *Ar, int Range, int Width) 
 {
 	int i, j;
@@ -33,6 +35,7 @@ void Smoof (double *Ar, int Range, int Width)
 	return;
 }
 
+//smoof a given mat M
 void Smoofimg (Mat M, int Range, int Width, int Height)
 {
 	int i, j, i1, j1;
@@ -165,6 +168,8 @@ degree Cameradegree ((Mat Previmg, Mat Currimg, int Height, int Width){
 			else Binary.at<int>(i, j) = 1;	
 		}
 	}
-	
+	//Current function: Get motion vector<x, y> by Cameramotion, then thershold imagine into new mat Binary,
+	//in Binary, 1 means this point have a large difference -> indicate moving object; 0 -> static background
+	//To be done: Image segmentation
 	
 }
