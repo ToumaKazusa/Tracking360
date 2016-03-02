@@ -1,2 +1,6 @@
 .obj
 .lib
+CMakeCache.txt
+CMakeLists.txt
+cmake_install.cmake
+
