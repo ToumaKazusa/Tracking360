@@ -3,5 +3,6 @@
 CMakeCache.txt
 CMakeLists.txt
 cmake_install.cmake
-CMakeFiles/*
+CMakeFiles/
+.swp
 
