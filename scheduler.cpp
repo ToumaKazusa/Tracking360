@@ -8,6 +8,8 @@
 using namespace cv;
 using namespace std;
 
+bool ProgramExit = false;
+
 class ImgBuf
 {
     enum {
@@ -116,7 +118,6 @@ ImgProducer::ImgProducer(ImgBuf* buf):picam(0)
     bInit = true;
 }
 
-
 bool ImgProducer::Produce()
 {
     // read a new frame from video
@@ -130,6 +131,40 @@ bool ImgProducer::Produce()
     return true;
 }
 
+void* producer(void* arg)
+{
+    ImgProducer* producer = (ImgProducer* ) arg;
+
+    while(!ProgramExit)
+    {
+        producer->Produce();
+        printf("produce .. at %d in %s\n", __LINE__, __FUNCTION__);
+    }
+    pthread_exit(NULL);
+}
+
+void* consumer(void* arg)
+{
+    char img_name[50];
+    static int i = 0;
+    Mat imgOriginal;
+    ImgBuf* buf = (ImgBuf* ) arg;
+    while(!ProgramExit && i != 20)
+    {
+        buf->PopImgBuff(imgOriginal);
+        sprintf(img_name, "img%d.jpg", i);
+        if(false == imwrite(img_name, imgOriginal))
+        {
+            fprintf(stderr, "image write failed\n");
+        }
+        i++;
+    }
+
+    ProgramExit = true;
+
+    pthread_exit(NULL);
+}
+
 int main( int argc, char** argv )
 {
     pthread_mutex_t lock;
@@ -141,25 +176,14 @@ int main( int argc, char** argv )
     }
 #define NUM_THREADS 2
 
-    //pthread_t threads[NUM_THREADS];
-
+    pthread_t threads[NUM_THREADS];
     ImgBuf buf(&lock);
     ImgProducer imgProducer(&buf);
 
-    int i = 0;
-    while (true && i < 20)
-    {
-        Mat imgOriginal;
-        imgProducer.Produce();
-        buf.PopImgBuff(imgOriginal);
-        char img_name[50];
-        sprintf(img_name, "img%d.jpg", i);
-        if(false == imwrite(img_name, imgOriginal))
-        {
-            fprintf(stderr, "image write failed\n");
-        }
-        ++i;
-    }
-
+    pthread_create(&threads[0], NULL, producer, static_cast<void*>(&imgProducer)); 
+    pthread_create(&threads[1], NULL, consumer, static_cast<void*>(&buf)); 
+    pthread_join(threads[0], NULL);
+    pthread_join(threads[1], NULL);
+    pthread_mutex_destroy(&lock);
     return 0;
 }
