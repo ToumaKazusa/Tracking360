@@ -19,7 +19,8 @@ class ImgBuf
         bool PushImgBuff(Mat& buff);
         bool PopImgBuff(Mat& buff);
         void SetMutex(pthread_mutex_t* mutex);
-        ImgBuf(pthread_mutex_t* mutex);
+        void SetCond(pthread_cond_t* cond);
+        ImgBuf(pthread_mutex_t* mutex, pthread_cond_t* cond);
         ImgBuf();
     private:
         ImgBuf(const ImgBuf &obj);
@@ -27,6 +28,7 @@ class ImgBuf
         int head, tail, sz;
         bool debug;
         pthread_mutex_t* _mutex;
+        pthread_cond_t*  _cond;;
 };
 
 ImgBuf::ImgBuf()
@@ -36,16 +38,22 @@ ImgBuf::ImgBuf()
     debug = DEBUG_360;
 }
 
-ImgBuf::ImgBuf(pthread_mutex_t* mutex)
+ImgBuf::ImgBuf(pthread_mutex_t* mutex, pthread_cond_t* cond)
 {
     head = tail = sz = 0;
     _mutex = mutex;
+    _cond  = cond;
     debug = DEBUG_360;
 }
 
 void ImgBuf::SetMutex(pthread_mutex_t* mutex)
 {
     _mutex = mutex;
+}
+
+void ImgBuf::SetCond(pthread_cond_t* cond)
+{
+    _cond = cond;
 }
 
 bool ImgBuf::PushImgBuff(Mat& buf)
@@ -67,21 +75,21 @@ bool ImgBuf::PushImgBuff(Mat& buf)
     sz++;
 
     pthread_mutex_unlock(_mutex);
+    pthread_cond_signal(_cond);
 
     return true;
 }
 
 bool ImgBuf::PopImgBuff(Mat& buf)
 {
-    if(!sz)
+    pthread_mutex_lock(_mutex);
+    while(sz == 0)
     {
         if(debug)
             fprintf(stderr, "buffer underflow detected at %d in %s \n", 
                     __LINE__, __FUNCTION__);
-        return false;
+        pthread_cond_wait(_cond, _mutex);
     }
-
-    pthread_mutex_lock(_mutex);
     buf = _buff[tail++];
     tail %= max_buff_size;
     --sz;
@@ -168,16 +176,23 @@ void* consumer(void* arg)
 int main( int argc, char** argv )
 {
     pthread_mutex_t lock;
+    pthread_cond_t buf_not_empty;
 
     if(pthread_mutex_init(&lock, NULL) != 0)
     {
         fprintf(stderr, "mutex init failed\n");
         return -1;
     }
+    if(pthread_cond_init(&buf_not_empty, NULL) !=0)
+    {
+        fprintf(stderr, "condition variable init failed\n");
+        return -1;
+    }
+
 #define NUM_THREADS 2
 
     pthread_t threads[NUM_THREADS];
-    ImgBuf buf(&lock);
+    ImgBuf buf(&lock, &buf_not_empty);
     ImgProducer imgProducer(&buf);
 
     pthread_create(&threads[0], NULL, producer, static_cast<void*>(&imgProducer)); 
