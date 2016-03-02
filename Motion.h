@@ -1,7 +1,4 @@
 #include <stdio.h>
-#include <softPwm.h>
-#include <stdint.h>
-
 
 struct direction{
 	int xdir;
