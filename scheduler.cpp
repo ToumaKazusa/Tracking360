@@ -102,10 +102,9 @@ class ImgProducer
 
 };
 
-ImgProducer::ImgProducer(ImgBuf* buf)
+ImgProducer::ImgProducer(ImgBuf* buf):picam(0)
 { 
     //capture the video from web cam
-    VideoCapture picam(0); 
 
     if (!picam.isOpened() )  
     {
@@ -140,6 +139,9 @@ int main( int argc, char** argv )
         fprintf(stderr, "mutex init failed\n");
         return -1;
     }
+#define NUM_THREADS 2
+
+    //pthread_t threads[NUM_THREADS];
 
     ImgBuf buf(&lock);
     ImgProducer imgProducer(&buf);
@@ -147,13 +149,8 @@ int main( int argc, char** argv )
     int i = 0;
     while (true && i < 20)
     {
-
-
-        //Mat imgHSV;
-        ////Convert the captured frame from BGR to HSV
-        //cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); 
-
         Mat imgOriginal;
+        imgProducer.Produce();
         buf.PopImgBuff(imgOriginal);
         char img_name[50];
         sprintf(img_name, "img%d.jpg", i);
@@ -161,30 +158,8 @@ int main( int argc, char** argv )
         {
             fprintf(stderr, "image write failed\n");
         }
-        printf("%s written\n", img_name);
         ++i;
     }
 
-     
-        //Mat imgThresholded;
-
-        //inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgThresholded); //Threshold the image
-        //  
-        ////morphological opening (remove small objects from the foreground)
-        //erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
-        //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
-
-        ////morphological closing (fill small holes in the foreground)
-        //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
-        //erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
-
-        //imshow("Thresholded Image", imgThresholded); //show the thresholded image
-        //imshow("Original", imgOriginal); //show the original image
-
-        //if (waitKey(30) == 27) //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
-        //{
-        //    cout << "esc key is pressed by user" << endl;
-        //    break; 
-        //}
     return 0;
 }
