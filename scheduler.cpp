@@ -1,13 +1,92 @@
 #include <iostream>
+#include <pthread.h>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+
+#define DEBUG_360 true
 
 using namespace cv;
 using namespace std;
 
+class ImgBuffer
+{
+    enum {
+        max_buff_size = 5,
+    };
+    public:
+        bool PushImgBuff(Mat& buff);
+        bool PopImgBuff(Mat& buff);
+        ImgBuffer(pthread_mutex_t* mutex);
+    private:
+        ImgBuffer(const ImgBuffer &obj);
+        Mat _buff[max_buff_size];
+        int head, tail, sz;
+        bool debug;
+        pthread_mutex_t* _mutex;
+};
+
+ImgBuffer::ImgBuffer(pthread_mutex_t* mutex)
+{
+    head = tail = sz = 0;
+    _mutex = mutex;
+    debug = DEBUG_360;
+}
+
+bool ImgBuffer::PushImgBuff(Mat& buf)
+{
+    pthread_mutex_lock(_mutex);
+
+    // if buffer is going to be overrided, 
+    // throw away old buffer and move tail index by one
+    if(sz == max_buff_size)
+    {
+        if(debug)
+            fprintf(stderr, "buffer overflow detected at %d in %s \n", 
+                    __LINE__, __FUNCTION__);
+        tail++;
+    }
+
+    _buff[head++] = buf;
+    head  %= max_buff_size;
+    sz++;
+
+    pthread_mutex_unlock(_mutex);
+
+    return true;
+}
+
+bool ImgBuffer::PopImgBuff(Mat& buf)
+{
+    if(!sz)
+    {
+        if(debug)
+            fprintf(stderr, "buffer underflow detected at %d in %s \n", 
+                    __LINE__, __FUNCTION__);
+        return false;
+    }
+
+    pthread_mutex_lock(_mutex);
+    buf = _buff[tail++];
+    tail %= max_buff_size;
+    --sz;
+    pthread_mutex_unlock(_mutex);
+
+    return true;
+}
+
  int main( int argc, char** argv )
  {
-    VideoCapture cap(0); //capture the video from web cam
+     pthread_mutex_t lock;
+
+     if(pthread_mutex_init(&lock, NULL) != 0)
+     {
+         fprintf(stderr, "mutex init failed\n");
+         return -1;
+     }
+
+
+     ImgBuffer buf(&lock);
+     VideoCapture cap(0); //capture the video from web cam
 
     if ( !cap.isOpened() )  // if not success, exit program
     {
@@ -36,8 +115,8 @@ using namespace std;
 //    cvCreateTrackbar("LowV", "Control", &iLowV, 255); //Value (0 - 255)
 //    cvCreateTrackbar("HighV", "Control", &iHighV, 255);
 
-    cout << "trying " << endl;
-    while (true)
+    int i = 0;
+    while (true && i < 20)
     {
         Mat imgOriginal;
 
@@ -48,14 +127,23 @@ using namespace std;
              cout << "Cannot read a frame from video stream" << endl;
              break;
         }
-         else
-         {
-             cout << "frame read from video stream" << endl;
-         }
 
         Mat imgHSV;
+        //Convert the captured frame from BGR to HSV
+        cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); 
 
-        cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
+        buf.PushImgBuff(imgHSV);
+        buf.PopImgBuff(imgHSV);
+        char img_name[50];
+        sprintf(img_name, "img%d.jpg", i);
+        if(false == imwrite(img_name, imgHSV))
+        {
+            fprintf(stderr, "image write failed\n");
+        }
+        printf("%s written\n", img_name);
+        ++i;
+    }
+
      
         //Mat imgThresholded;
 
@@ -77,7 +165,5 @@ using namespace std;
         //    cout << "esc key is pressed by user" << endl;
         //    break; 
         //}
-    }
-
    return 0;
 }

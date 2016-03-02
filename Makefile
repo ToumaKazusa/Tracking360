@@ -111,53 +111,29 @@ Tracking360/fast:
 	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/build
 .PHONY : Tracking360/fast
 
-Motion.o: Motion.cpp.o
-.PHONY : Motion.o
+scheduler.o: scheduler.cpp.o
+.PHONY : scheduler.o
 
 # target to build an object file
-Motion.cpp.o:
-	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/Motion.cpp.o
-.PHONY : Motion.cpp.o
+scheduler.cpp.o:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/scheduler.cpp.o
+.PHONY : scheduler.cpp.o
 
-Motion.i: Motion.cpp.i
-.PHONY : Motion.i
-
-# target to preprocess a source file
-Motion.cpp.i:
-	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/Motion.cpp.i
-.PHONY : Motion.cpp.i
-
-Motion.s: Motion.cpp.s
-.PHONY : Motion.s
-
-# target to generate assembly for a file
-Motion.cpp.s:
-	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/Motion.cpp.s
-.PHONY : Motion.cpp.s
-
-test.o: test.cpp.o
-.PHONY : test.o
-
-# target to build an object file
-test.cpp.o:
-	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/test.cpp.o
-.PHONY : test.cpp.o
-
-test.i: test.cpp.i
-.PHONY : test.i
+scheduler.i: scheduler.cpp.i
+.PHONY : scheduler.i
 
 # target to preprocess a source file
-test.cpp.i:
-	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/test.cpp.i
-.PHONY : test.cpp.i
+scheduler.cpp.i:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/scheduler.cpp.i
+.PHONY : scheduler.cpp.i
 
-test.s: test.cpp.s
-.PHONY : test.s
+scheduler.s: scheduler.cpp.s
+.PHONY : scheduler.s
 
 # target to generate assembly for a file
-test.cpp.s:
-	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/test.cpp.s
-.PHONY : test.cpp.s
+scheduler.cpp.s:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/scheduler.cpp.s
+.PHONY : scheduler.cpp.s
 
 # Help Target
 help:
@@ -168,12 +144,9 @@ help:
 	@echo "... Tracking360"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... Motion.o"
-	@echo "... Motion.i"
-	@echo "... Motion.s"
-	@echo "... test.o"
-	@echo "... test.i"
-	@echo "... test.s"
+	@echo "... scheduler.o"
+	@echo "... scheduler.i"
+	@echo "... scheduler.s"
 .PHONY : help
 
 
