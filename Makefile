@@ -39,10 +39,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/joseph/RPdev/Tracking360/test
+CMAKE_SOURCE_DIR = /home/joseph/RPdev/Tracking360
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/joseph/RPdev/Tracking360/test
+CMAKE_BINARY_DIR = /home/joseph/RPdev/Tracking360
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -69,9 +69,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/joseph/RPdev/Tracking360/test/CMakeFiles /home/joseph/RPdev/Tracking360/test/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/joseph/RPdev/Tracking360/CMakeFiles /home/joseph/RPdev/Tracking360/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/joseph/RPdev/Tracking360/test/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/joseph/RPdev/Tracking360/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -99,41 +99,41 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named test
+# Target rules for targets named Tracking360
 
 # Build rule for target.
-test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 test
-.PHONY : test
+Tracking360: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Tracking360
+.PHONY : Tracking360
 
 # fast build rule for target.
-test/fast:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
-.PHONY : test/fast
+Tracking360/fast:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/build
+.PHONY : Tracking360/fast
 
-test.o: test.cpp.o
-.PHONY : test.o
+scheduler.o: scheduler.cpp.o
+.PHONY : scheduler.o
 
 # target to build an object file
-test.cpp.o:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/test.cpp.o
-.PHONY : test.cpp.o
+scheduler.cpp.o:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/scheduler.cpp.o
+.PHONY : scheduler.cpp.o
 
-test.i: test.cpp.i
-.PHONY : test.i
+scheduler.i: scheduler.cpp.i
+.PHONY : scheduler.i
 
 # target to preprocess a source file
-test.cpp.i:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/test.cpp.i
-.PHONY : test.cpp.i
+scheduler.cpp.i:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/scheduler.cpp.i
+.PHONY : scheduler.cpp.i
 
-test.s: test.cpp.s
-.PHONY : test.s
+scheduler.s: scheduler.cpp.s
+.PHONY : scheduler.s
 
 # target to generate assembly for a file
-test.cpp.s:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/test.cpp.s
-.PHONY : test.cpp.s
+scheduler.cpp.s:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/scheduler.cpp.s
+.PHONY : scheduler.cpp.s
 
 # Help Target
 help:
@@ -141,12 +141,12 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... Tracking360"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... test"
-	@echo "... test.o"
-	@echo "... test.i"
-	@echo "... test.s"
+	@echo "... scheduler.o"
+	@echo "... scheduler.i"
+	@echo "... scheduler.s"
 .PHONY : help
 
 
