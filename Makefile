@@ -39,10 +39,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/joseph/RPdev/Tracking360/test
+CMAKE_SOURCE_DIR = /home/joseph/RPdev/Tracking360
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/joseph/RPdev/Tracking360/test
+CMAKE_BINARY_DIR = /home/joseph/RPdev/Tracking360
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -69,9 +69,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/joseph/RPdev/Tracking360/test/CMakeFiles /home/joseph/RPdev/Tracking360/test/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/joseph/RPdev/Tracking360/CMakeFiles /home/joseph/RPdev/Tracking360/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/joseph/RPdev/Tracking360/test/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/joseph/RPdev/Tracking360/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -99,24 +99,48 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named test
+# Target rules for targets named Tracking360
 
 # Build rule for target.
-test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 test
-.PHONY : test
+Tracking360: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Tracking360
+.PHONY : Tracking360
 
 # fast build rule for target.
-test/fast:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
-.PHONY : test/fast
+Tracking360/fast:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/build
+.PHONY : Tracking360/fast
+
+Motion.o: Motion.cpp.o
+.PHONY : Motion.o
+
+# target to build an object file
+Motion.cpp.o:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/Motion.cpp.o
+.PHONY : Motion.cpp.o
+
+Motion.i: Motion.cpp.i
+.PHONY : Motion.i
+
+# target to preprocess a source file
+Motion.cpp.i:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/Motion.cpp.i
+.PHONY : Motion.cpp.i
+
+Motion.s: Motion.cpp.s
+.PHONY : Motion.s
+
+# target to generate assembly for a file
+Motion.cpp.s:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/Motion.cpp.s
+.PHONY : Motion.cpp.s
 
 test.o: test.cpp.o
 .PHONY : test.o
 
 # target to build an object file
 test.cpp.o:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/test.cpp.o
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/test.cpp.o
 .PHONY : test.cpp.o
 
 test.i: test.cpp.i
@@ -124,7 +148,7 @@ test.i: test.cpp.i
 
 # target to preprocess a source file
 test.cpp.i:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/test.cpp.i
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/test.cpp.i
 .PHONY : test.cpp.i
 
 test.s: test.cpp.s
@@ -132,7 +156,7 @@ test.s: test.cpp.s
 
 # target to generate assembly for a file
 test.cpp.s:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/test.cpp.s
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/test.cpp.s
 .PHONY : test.cpp.s
 
 # Help Target
@@ -141,9 +165,12 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... Tracking360"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... test"
+	@echo "... Motion.o"
+	@echo "... Motion.i"
+	@echo "... Motion.s"
 	@echo "... test.o"
 	@echo "... test.i"
 	@echo "... test.s"
