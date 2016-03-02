@@ -163,7 +163,7 @@ degree Cameradegree (Mat Previmg, Mat Currimg, int Height, int Width){
 	Smoofimg(Currimg, 5, Width, Height);
 	int i, j;
 	int thershold = 20;
-	Mat Binary = Mat::zeros(int Height, int Width, int);
+	Mat Binary = Mat::zeros(Height, Width, int);
 	for(i = std::max(0, motion.ydir);i < std::min(Height, Height + motion.xdir);i ++)
 	{
 		for(j = std::max(0, motion.xdir);j < std::min(Width, Width + motion.xdir);j ++)
