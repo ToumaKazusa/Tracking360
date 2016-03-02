@@ -172,4 +172,8 @@ degree Cameradegree ((Mat Previmg, Mat Currimg, int Height, int Width){
 	//in Binary, 1 means this point have a large difference -> indicate moving object; 0 -> static background
 	//To be done: Image segmentation
 	
+	degree result;
+	result.vt = 0;
+	result.hr = 0;
+	return result;
 }
