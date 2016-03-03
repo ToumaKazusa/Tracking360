@@ -200,7 +200,7 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
 	//To be done: Image segmentation
 	int w = Width / 32;
 	int h = Height / 24;
-	int i1, j1, count, s = 0;
+	int i1, j1, count, si = 0, sj = 0, area = 0;
 	result.x = 0;
 	result.y = 0;
 	for(i = 0;i < h;i ++)
@@ -211,20 +211,22 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
 			for(i1 = 0;i1 < 24;i1 ++)for(j1 = 0;j1 < 32;j1 ++)if(Binary.at<uchar>(24 * i + i1, 32 * j + j1) > 0)count ++;
 			if(count > 150)
 			{
-				result.x += j;
-				result.y += i;
-				s++;
+				result.x += j * j;
+				result.y += i * i;
+				area++;
+				sj += j;
+				si += i;
 			}
 		}
 	}
-	if(s > 100) 
+	if(area > 100) 
 	{
 		result.x = result.y = 0;
 		return;
 	}
-	if(s > 0)result.x = 54 * result.x / (s * w) - 27;
+	if(s > 0)result.x = 54 * result.x / (sj * w) - 27;
     	else result.x = 0;
-	if(s > 0)result.y = 40 * result.y / (s * h) - 20;
+	if(s > 0)result.y = 40 * result.y / (si * h) - 20;
 	else result.y = 0;
 	cout << "Result:" << result.x << " "  << result.y << endl;
 }
