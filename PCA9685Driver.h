@@ -1,6 +1,8 @@
+#ifdef __cplusplus
+extern "C"{
+#endif
 #ifndef PCA9685_H
 #define PCA9685_H
-
 typedef enum
 {
     MODE1              = 0x00,
@@ -79,4 +81,7 @@ void Track360MtrCtrl_Pan(struct Track360MotorControlType* self, int degree);
 void Track360MtrCtrl_TiltFrmCurPos(struct Track360MotorControlType* self, int degree, VDirection direction);
 
 void Track360MtrCtrl_PanFrmCurPos(struct Track360MotorControlType* self, int degree, HDirection direction);
+#endif
+#ifdef __cplusplus
+}
 #endif

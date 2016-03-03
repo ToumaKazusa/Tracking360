@@ -111,29 +111,53 @@ Tracking360/fast:
 	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/build
 .PHONY : Tracking360/fast
 
-scheduler.o: scheduler.cpp.o
-.PHONY : scheduler.o
+PCA9685Driver.o: PCA9685Driver.c.o
+.PHONY : PCA9685Driver.o
 
 # target to build an object file
-scheduler.cpp.o:
-	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/scheduler.cpp.o
-.PHONY : scheduler.cpp.o
+PCA9685Driver.c.o:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/PCA9685Driver.c.o
+.PHONY : PCA9685Driver.c.o
 
-scheduler.i: scheduler.cpp.i
-.PHONY : scheduler.i
+PCA9685Driver.i: PCA9685Driver.c.i
+.PHONY : PCA9685Driver.i
 
 # target to preprocess a source file
-scheduler.cpp.i:
-	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/scheduler.cpp.i
-.PHONY : scheduler.cpp.i
+PCA9685Driver.c.i:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/PCA9685Driver.c.i
+.PHONY : PCA9685Driver.c.i
 
-scheduler.s: scheduler.cpp.s
-.PHONY : scheduler.s
+PCA9685Driver.s: PCA9685Driver.c.s
+.PHONY : PCA9685Driver.s
 
 # target to generate assembly for a file
-scheduler.cpp.s:
-	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/scheduler.cpp.s
-.PHONY : scheduler.cpp.s
+PCA9685Driver.c.s:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/PCA9685Driver.c.s
+.PHONY : PCA9685Driver.c.s
+
+Scheduler.o: Scheduler.cpp.o
+.PHONY : Scheduler.o
+
+# target to build an object file
+Scheduler.cpp.o:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/Scheduler.cpp.o
+.PHONY : Scheduler.cpp.o
+
+Scheduler.i: Scheduler.cpp.i
+.PHONY : Scheduler.i
+
+# target to preprocess a source file
+Scheduler.cpp.i:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/Scheduler.cpp.i
+.PHONY : Scheduler.cpp.i
+
+Scheduler.s: Scheduler.cpp.s
+.PHONY : Scheduler.s
+
+# target to generate assembly for a file
+Scheduler.cpp.s:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/Scheduler.cpp.s
+.PHONY : Scheduler.cpp.s
 
 # Help Target
 help:
@@ -144,9 +168,12 @@ help:
 	@echo "... Tracking360"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... scheduler.o"
-	@echo "... scheduler.i"
-	@echo "... scheduler.s"
+	@echo "... PCA9685Driver.o"
+	@echo "... PCA9685Driver.i"
+	@echo "... PCA9685Driver.s"
+	@echo "... Scheduler.o"
+	@echo "... Scheduler.i"
+	@echo "... Scheduler.s"
 .PHONY : help
 
 

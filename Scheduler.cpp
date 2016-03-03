@@ -2,6 +2,8 @@
 #include <pthread.h>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "coordinates.h"
+#include "PCA9685Driver.h"
 
 #define DEBUG_360 true
 
@@ -9,36 +11,38 @@ using namespace cv;
 using namespace std;
 
 bool ProgramExit = false;
-
+template<class T>
 class ImgBuf
 {
     enum {
         max_buff_size = 5,
     };
     public:
-        bool PushImgBuff(Mat& buff);
-        bool PopImgBuff(Mat& buff);
+        bool PushImgBuff(T& buff);
+        bool PopImgBuff(T& buff);
         void SetMutex(pthread_mutex_t* mutex);
         void SetCond(pthread_cond_t* cond);
         ImgBuf(pthread_mutex_t* mutex, pthread_cond_t* cond);
         ImgBuf();
     private:
         ImgBuf(const ImgBuf &obj);
-        Mat _buff[max_buff_size];
+        T _buff[max_buff_size];
         int head, tail, sz;
         bool debug;
         pthread_mutex_t* _mutex;
         pthread_cond_t*  _cond;;
 };
 
-ImgBuf::ImgBuf()
+template<class T>
+ImgBuf<T>::ImgBuf()
 {
     head = tail = sz = 0;
     _mutex = NULL;
     debug = DEBUG_360;
 }
 
-ImgBuf::ImgBuf(pthread_mutex_t* mutex, pthread_cond_t* cond)
+template<class T>
+ImgBuf<T>::ImgBuf(pthread_mutex_t* mutex, pthread_cond_t* cond)
 {
     head = tail = sz = 0;
     _mutex = mutex;
@@ -46,17 +50,20 @@ ImgBuf::ImgBuf(pthread_mutex_t* mutex, pthread_cond_t* cond)
     debug = DEBUG_360;
 }
 
-void ImgBuf::SetMutex(pthread_mutex_t* mutex)
+template<class T>
+void ImgBuf<T>::SetMutex(pthread_mutex_t* mutex)
 {
     _mutex = mutex;
 }
 
-void ImgBuf::SetCond(pthread_cond_t* cond)
+template<class T>
+void ImgBuf<T>::SetCond(pthread_cond_t* cond)
 {
     _cond = cond;
 }
 
-bool ImgBuf::PushImgBuff(Mat& buf)
+template<class T>
+bool ImgBuf<T>::PushImgBuff(T& buf)
 {
     pthread_mutex_lock(_mutex);
 
@@ -80,7 +87,8 @@ bool ImgBuf::PushImgBuff(Mat& buf)
     return true;
 }
 
-bool ImgBuf::PopImgBuff(Mat& buf)
+template<class T>
+bool ImgBuf<T>::PopImgBuff(T& buf)
 {
     pthread_mutex_lock(_mutex);
     while(sz == 0)
@@ -101,18 +109,18 @@ bool ImgBuf::PopImgBuff(Mat& buf)
 class ImgProducer
 {
     public:
-        ImgProducer(ImgBuf*);
+        ImgProducer(ImgBuf<Mat>*);
         bool Produce(void);
     private:
-        ImgProducer(const ImgBuf &obj);
-        ImgBuf* ImgBuffs;
+        ImgProducer(const ImgBuf<Mat> &obj);
+        ImgBuf<Mat>* ImgBuffs;
         VideoCapture picam;
         Mat buffImg;
         bool bInit;
 
 };
 
-ImgProducer::ImgProducer(ImgBuf* buf):picam(0)
+ImgProducer::ImgProducer(ImgBuf<Mat>* buf):picam(0)
 { 
     //capture the video from web cam
 
@@ -156,7 +164,7 @@ void* consumer(void* arg)
     char img_name[50];
     static int i = 0;
     Mat imgOriginal;
-    ImgBuf* buf = (ImgBuf* ) arg;
+    ImgBuf<Mat>* buf = (ImgBuf<Mat>* ) arg;
     while(!ProgramExit && i != 20)
     {
         buf->PopImgBuff(imgOriginal);
@@ -173,32 +181,87 @@ void* consumer(void* arg)
     pthread_exit(NULL);
 }
 
+class ServoController
+{
+    public:
+        void Sense();
+        ServoController(ImgBuf<struct degree> *);
+    private:
+        ImgBuf<struct degree> *cmdBuf;
+        struct degree current_pos;
+        struct Track360MotorControlType actuator;
+};
+
+ServoController::ServoController(ImgBuf<struct degree>* buf)
+{
+    cmdBuf = buf;
+    current_pos.x = current_pos.y = 90;
+    Track360MtrCtrl_Init(&actuator);
+    Track360MtrCtrl_Pan(&actuator, current_pos.x);
+    Track360MtrCtrl_Tilt(&actuator, current_pos.y);
+}
+
+void ServoController::Sense(void)
+{
+    struct degree cmd;
+    cmdBuf->PopImgBuff(cmd);
+    if(current_pos.x != cmd.x)
+    { 
+        Track360MtrCtrl_Pan(&actuator, cmd.y);
+        current_pos.x = cmd.x;
+    }
+    if(current_pos.y != cmd.y)
+    { 
+        Track360MtrCtrl_Tilt(&actuator, cmd.x);
+        current_pos.y = cmd.y;
+    }
+}
+
+void* actuate(void* arg)
+{
+    ServoController* controller = (ServoController*) arg;
+    while(!ProgramExit)
+    { 
+        controller->Sense();
+    }
+
+    pthread_exit(NULL);
+}
+
 int main( int argc, char** argv )
 {
-    pthread_mutex_t lock;
-    pthread_cond_t buf_not_empty;
+    pthread_mutex_t lock, cmd_lock;
+    pthread_cond_t buf_not_empty, cmd_ready_cond;
 
-    if(pthread_mutex_init(&lock, NULL) != 0)
+    if(pthread_mutex_init(&lock, NULL) != 0 ||
+       pthread_mutex_init(&cmd_lock, NULL) != 0)
     {
         fprintf(stderr, "mutex init failed\n");
         return -1;
     }
-    if(pthread_cond_init(&buf_not_empty, NULL) !=0)
+    if(pthread_cond_init(&buf_not_empty, NULL)  != 0 ||
+       pthread_cond_init(&cmd_ready_cond, NULL) != 0)
     {
         fprintf(stderr, "condition variable init failed\n");
         return -1;
     }
 
-#define NUM_THREADS 2
+#define NUM_THREADS 3
 
     pthread_t threads[NUM_THREADS];
-    ImgBuf buf(&lock, &buf_not_empty);
+    ImgBuf<Mat> buf(&lock, &buf_not_empty);
+    ImgBuf<struct degree> cmdBuf(&cmd_lock, &cmd_ready_cond);
     ImgProducer imgProducer(&buf);
-
+    ServoController controller(&cmdBuf);
     pthread_create(&threads[0], NULL, producer, static_cast<void*>(&imgProducer)); 
     pthread_create(&threads[1], NULL, consumer, static_cast<void*>(&buf)); 
+    pthread_create(&threads[2], NULL, actuate,  static_cast<void*>(&cmdBuf)); 
     pthread_join(threads[0], NULL);
     pthread_join(threads[1], NULL);
+    pthread_join(threads[2], NULL);
     pthread_mutex_destroy(&lock);
+    pthread_mutex_destroy(&cmd_lock);
+    pthread_cond_destroy(&buf_not_empty);
+    pthread_cond_destroy(&cmd_ready_cond);
     return 0;
 }
