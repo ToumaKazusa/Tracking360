@@ -1,6 +1,8 @@
 #ifndef H_COORDINATES_H
 #define  H_COORDINATES_H 
 #include <opencv2/opencv.hpp>
+#define DEBUG_360 1
+
 using namespace cv;
 
 struct degree{
