@@ -3,8 +3,6 @@
 #include "coordinates.h"
 #include "PCA9685Driver.h"
 
-#define DEBUG_360 true
-
 using namespace cv;
 using namespace std;
 

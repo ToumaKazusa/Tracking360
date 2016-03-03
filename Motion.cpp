@@ -156,10 +156,7 @@ direction Cameramotion (Mat& Previmg, Mat& Currimg, int Width, int Height){
 void Cameradegree (Mat& Previmg, Mat& Currimg, 
         struct degree& result, int Width, int Height)
 {
-#if 1
 	direction motion = Cameramotion(Previmg, Currimg, Width, Height);
-#endif
-    //cout << "Pass motion detect!" << motion.xdir << ' ' << motion.ydir << endl;
 //	Smoofimg(Previmg, 5, Width, Height);
 //	Smoofimg(Currimg, 5, Width, Height);
 	int i, j;
@@ -173,7 +170,7 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
     //{
     //    cout << "saved prev img" << endl;
     //}
-#if 1
+#if DEBUG_360
     static int z = 0;
     char name[50];
     sprintf(name, "img%d.jpg", z++);
