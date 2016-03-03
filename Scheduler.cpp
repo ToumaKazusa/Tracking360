@@ -1,7 +1,5 @@
 #include <iostream>
 #include <pthread.h>
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
 #include "coordinates.h"
 #include "PCA9685Driver.h"
 
@@ -159,27 +157,36 @@ void* producer(void* arg)
     pthread_exit(NULL);
 }
 
-void* consumer(void* arg)
+class ImageProcessor
 {
-    char img_name[50];
-    static int i = 0;
-    Mat imgOriginal;
-    ImgBuf<Mat>* buf = (ImgBuf<Mat>* ) arg;
-    while(!ProgramExit && i != 20)
-    {
-        buf->PopImgBuff(imgOriginal);
-        sprintf(img_name, "img%d.jpg", i);
-        if(false == imwrite(img_name, imgOriginal))
-        {
-            fprintf(stderr, "image write failed\n");
-        }
-        i++;
-    }
+    public:
+        ImageProcessor(ImgBuf<Mat>*, ImgBuf<struct degree>*);
+        void Process();
+    private:
+        Mat curImg, prevImg;
+        ImgBuf<Mat>* _imgBuf; 
+        ImgBuf<struct degree>* _cmdBuf;
+        bool bPrevImgPresent;
+};
 
-    ProgramExit = true;
-
-    pthread_exit(NULL);
+ImageProcessor::ImageProcessor(ImgBuf<Mat>* imgBuf, ImgBuf<struct degree>* cmdBuf)
+{ 
+    _imgBuf = imgBuf;
+    _cmdBuf = cmdBuf;
+    bPrevImgPresent = false;
 }
+
+void ImageProcessor::Process()
+{
+    struct degree result;
+    _imgBuf->PopImgBuff(curImg);
+    if(bPrevImgPresent)
+        Cameradegree (prevImg, curImg, result);
+    prevImg = curImg.clone(); 
+    bPrevImgPresent = true;
+    _cmdBuf->PushImgBuff(result);
+}
+
 
 class ServoController
 {
@@ -217,6 +224,21 @@ void ServoController::Sense(void)
     }
 }
 
+void* consumer(void* arg)
+{
+    static int i = 0;
+    ImageProcessor* imgProc = (ImageProcessor* ) arg;
+    while(!ProgramExit && i != 1000)
+    {
+        imgProc->Process();
+        i++;
+    }
+
+    ProgramExit = true;
+
+    pthread_exit(NULL);
+}
+
 void* actuate(void* arg)
 {
     ServoController* controller = (ServoController*) arg;
@@ -249,13 +271,17 @@ int main( int argc, char** argv )
 #define NUM_THREADS 3
 
     pthread_t threads[NUM_THREADS];
+
     ImgBuf<Mat> buf(&lock, &buf_not_empty);
     ImgBuf<struct degree> cmdBuf(&cmd_lock, &cmd_ready_cond);
+
     ImgProducer imgProducer(&buf);
+    ImageProcessor imgProcessor(&buf, &cmdBuf);
     ServoController controller(&cmdBuf);
+
     pthread_create(&threads[0], NULL, producer, static_cast<void*>(&imgProducer)); 
-    pthread_create(&threads[1], NULL, consumer, static_cast<void*>(&buf)); 
-    pthread_create(&threads[2], NULL, actuate,  static_cast<void*>(&cmdBuf)); 
+    pthread_create(&threads[1], NULL, consumer, static_cast<void*>(&imgProcessor)); 
+    pthread_create(&threads[2], NULL, actuate,  static_cast<void*>(&controller)); 
     pthread_join(threads[0], NULL);
     pthread_join(threads[1], NULL);
     pthread_join(threads[2], NULL);
