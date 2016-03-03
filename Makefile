@@ -111,6 +111,30 @@ Tracking360/fast:
 	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/build
 .PHONY : Tracking360/fast
 
+Motion.o: Motion.cpp.o
+.PHONY : Motion.o
+
+# target to build an object file
+Motion.cpp.o:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/Motion.cpp.o
+.PHONY : Motion.cpp.o
+
+Motion.i: Motion.cpp.i
+.PHONY : Motion.i
+
+# target to preprocess a source file
+Motion.cpp.i:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/Motion.cpp.i
+.PHONY : Motion.cpp.i
+
+Motion.s: Motion.cpp.s
+.PHONY : Motion.s
+
+# target to generate assembly for a file
+Motion.cpp.s:
+	$(MAKE) -f CMakeFiles/Tracking360.dir/build.make CMakeFiles/Tracking360.dir/Motion.cpp.s
+.PHONY : Motion.cpp.s
+
 PCA9685Driver.o: PCA9685Driver.c.o
 .PHONY : PCA9685Driver.o
 
@@ -168,6 +192,9 @@ help:
 	@echo "... Tracking360"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... Motion.o"
+	@echo "... Motion.i"
+	@echo "... Motion.s"
 	@echo "... PCA9685Driver.o"
 	@echo "... PCA9685Driver.i"
 	@echo "... PCA9685Driver.s"

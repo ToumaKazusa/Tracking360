@@ -1,7 +1,5 @@
-//#include "opencv2/highgui/highgui.hpp"
-//#include "opencv2/imgproc/imgproc.hpp"
-#include <opencv2/opencv.hpp>
 #include <stdio.h>
+#include "coordinates.h"
 
 using namespace cv;
 using namespace std;
@@ -9,11 +7,6 @@ using namespace std;
 struct direction{
 	int xdir;
 	int ydir;
-};
-
-struct degree{
-	int x;
-	int y;
 };
 
 //Smoof a continus array
@@ -161,7 +154,9 @@ direction Cameramotion (Mat& Previmg, Mat& Currimg, int Width, int Height){
 	return motion;	
 }
 
-Mat Cameradegree (Mat& Previmg, Mat& Currimg, degree& result, int Width = 640, int Height = 480){
+Mat Cameradegree (Mat& Previmg, Mat& Currimg, 
+        struct degree& result, int Width, int Height)
+{
 	direction motion = Cameramotion(Previmg, Currimg, Width, Height);
 	cout << motion.xdir << ' ' << motion.ydir << endl;
 //	Smoofimg(Previmg, 5, Width, Height);
@@ -183,7 +178,7 @@ Mat Cameradegree (Mat& Previmg, Mat& Currimg, degree& result, int Width = 640, i
 	//To be done: Image segmentation
 	int w = Width / 80;
 	int h = Height / 80;
-	int i1, j1, count, s;
+	int i1, j1, count, s = 0;
 	result.x = 0;
 	result.y = 0;
 	for(i = 0;i < h;i ++)
@@ -196,7 +191,7 @@ Mat Cameradegree (Mat& Previmg, Mat& Currimg, degree& result, int Width = 640, i
 			{
 				result.x += j;
 				result.y += i;
-				s ++;
+				s++;
 			}
 		}
 	}
@@ -205,7 +200,7 @@ Mat Cameradegree (Mat& Previmg, Mat& Currimg, degree& result, int Width = 640, i
 	return Binary;
 }
 
-void updatedegree(degree& currentdeg, degree& cmd)
+void updatedegree(struct degree& currentdeg, struct degree& cmd)
 {
 	if(cmd.x > 0)currentdeg.x = std::min(180, currentdeg.x + cmd.x);
 	else currentdeg.x = std::max(0, currentdeg.x + cmd.x);
