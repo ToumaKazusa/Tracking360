@@ -2,8 +2,8 @@
 #include <wiringPi.h>
 #include <stdio.h>
 #include <unistd.h>
-#include "PCA9685Driver.h"
 #include <math.h>
+#include "PCA9685Driver.h"
 
 #define DEBUGON 1
 
