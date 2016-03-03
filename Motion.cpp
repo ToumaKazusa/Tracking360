@@ -211,5 +211,6 @@ void updatedegree(degree& currentdeg, degree& cmd)
 	else currentdeg.x = std::max(0, currentdeg.x + cmd.x);
 	if(cmd.y > 0)currentdeg.y = std::min(180, currentdeg.y + cmd.y);
 	else currentdeg.y = std::max(0, currentdeg.y + cmd.y);
+	return;
 }
 
