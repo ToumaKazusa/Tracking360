@@ -211,8 +211,8 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
 			for(i1 = 0;i1 < 24;i1 ++)for(j1 = 0;j1 < 32;j1 ++)if(Binary.at<uchar>(24 * i + i1, 32 * j + j1) > 0)count ++;
 			if(count > 150)
 			{
-				result.x += j;
-				result.y += i;j
+				result.x += j * j;
+				result.y += i * i;
 				area++;
 				sj += j;
 				si += i;
