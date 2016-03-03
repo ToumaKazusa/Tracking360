@@ -160,8 +160,8 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
 	direction motion = Cameramotion(Previmg, Currimg, Width, Height);
 #endif
     //cout << "Pass motion detect!" << motion.xdir << ' ' << motion.ydir << endl;
-//	Smoofimg(Previmg, 5, Width, Height);
-//	Smoofimg(Currimg, 5, Width, Height);
+	//Smoofimg(Previmg, 5, Width, Height);
+	//Smoofimg(Currimg, 5, Width, Height);
 	int i, j;
 	int thershold = 30;
 	Mat Binary = Mat::zeros(Height, Width, CV_8U);
@@ -173,7 +173,7 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
     //{
     //    cout << "saved prev img" << endl;
     //}
-#if 1
+#if 0
     static int z = 0;
     char name[50];
     sprintf(name, "img%d.jpg", z++);
