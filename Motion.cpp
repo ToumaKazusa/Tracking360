@@ -61,7 +61,7 @@ void Smoofimg (Mat M, int Range, int Width, int Height)
 }
 
 direction Cameramotion (Mat& Previmg, Mat& Currimg, int Width, int Height){
-	double *sump, *sumc, *diff;
+	double*sump, *sumc, *diff;
 	int i, j;
 	direction motion;
 	//Calculate x-motion of image 
@@ -146,7 +146,6 @@ direction Cameramotion (Mat& Previmg, Mat& Currimg, int Width, int Height){
 			pos = i;
 		}
 	}
-	for(i = 0;i < 120;i ++)cout << sump[i] << '\t' << sumc[i] << endl;
 	motion.ydir = pos - 120;
 	delete[] sump;
 	delete[] sumc;
@@ -154,30 +153,53 @@ direction Cameramotion (Mat& Previmg, Mat& Currimg, int Width, int Height){
 	return motion;	
 }
 
-Mat Cameradegree (Mat& Previmg, Mat& Currimg, 
+void Cameradegree (Mat& Previmg, Mat& Currimg, 
         struct degree& result, int Width, int Height)
 {
+#if 1
 	direction motion = Cameramotion(Previmg, Currimg, Width, Height);
-	cout << motion.xdir << ' ' << motion.ydir << endl;
+#endif
+    //cout << "Pass motion detect!" << motion.xdir << ' ' << motion.ydir << endl;
 //	Smoofimg(Previmg, 5, Width, Height);
 //	Smoofimg(Currimg, 5, Width, Height);
 	int i, j;
 	int thershold = 30;
 	Mat Binary = Mat::zeros(Height, Width, CV_8U);
-	for(i = std::max(0, motion.ydir);i < std::min(Height, Height + motion.xdir);i ++)
+    //if(false == imwrite("opencvimg1.jpg", Previmg))
+    //{
+    //    cout << "not saved prev img" << endl;
+    //}
+    //else
+    //{
+    //    cout << "saved prev img" << endl;
+    //}
+#if 0
+    static int z = 0;
+    char name[50];
+    sprintf(name, "img%d.jpg", z++);
+    if(false == imwrite(name, Currimg))
+    {
+        cout << "not saved cur img" << endl;
+    }
+    //else
+    //{
+    //    cout << "saved cur img" << endl;
+    //}
+#endif
+    for(i = std::max(0, motion.ydir);i < std::min(Height, Height + motion.ydir);i ++)
 	{
 		for(j = std::max(0, motion.xdir);j < std::min(Width, Width + motion.xdir);j ++)
 		{
 			if(abs(Currimg.at<uchar>(i, j) - Previmg.at<uchar>(i - motion.ydir, j - motion.xdir)) < thershold)
 				Binary.at<uchar>(i, j) = 0;
-			else Binary.at<uchar>(i, j) = Currimg.at<uchar>(i, j) - Previmg.at<uchar>(i - motion.ydir, j - motion.xdir);	
+			else Binary.at<uchar>(i, j) = 255; //Currimg.at<uchar>(i, j) - Previmg.at<uchar>(i - motion.ydir, j - motion.xdir);	
 		}
 	}
 	//Current function: Get motion vector<x, y> by Cameramotion, then thershold imagine into new mat Binary,
 	//in Binary, 1 means this point have a large difference -> indicate moving object; 0 -> static background
 	//To be done: Image segmentation
 	int w = Width / 80;
-	int h = Height / 80;
+	int h = Height / 60;
 	int i1, j1, count, s = 0;
 	result.x = 0;
 	result.y = 0;
@@ -186,8 +208,8 @@ Mat Cameradegree (Mat& Previmg, Mat& Currimg,
 		for(j = 0;j < w;j ++)
 		{
 			count = 0;
-			for(i1 = 0;i1 < 80;i1 ++)for(j1 = 0;j1 < 80;j1 ++)if(Binary.at<uchar>(80 * i + i1, 80 * j + j1) > 0)count ++;
-			if(count > 1000)
+			for(i1 = 0;i1 < 60;i1 ++)for(j1 = 0;j1 < 80;j1 ++)if(Binary.at<uchar>(60 * i + i1, 80 * j + j1) > 0)count ++;
+			if(count > 1500)
 			{
 				result.x += j;
 				result.y += i;
@@ -195,17 +217,18 @@ Mat Cameradegree (Mat& Previmg, Mat& Currimg,
 			}
 		}
 	}
-	result.x = 54 * result.x / (s * w) - 27;
-	result.y = 42 * result.y / (s * h) - 21;
-	return Binary;
+	if(s > 0)result.x = 54 * result.x / (s * w) - 27;
+    else result.x = 0;
+	if(s > 0)result.y = 40 * result.y / (s * h) - 20;
+	else result.y = 0;
+    cout << "Result:" << result.x << " "  << result.y << endl;
 }
 
 void updatedegree(struct degree& currentdeg, struct degree& cmd)
 {
-	if(cmd.x > 0)currentdeg.x = std::min(180, currentdeg.x + cmd.x);
-	else currentdeg.x = std::max(0, currentdeg.x + cmd.x);
-	if(cmd.y > 0)currentdeg.y = std::min(180, currentdeg.y + cmd.y);
-	else currentdeg.y = std::max(0, currentdeg.y + cmd.y);
-	return;
+	if(cmd.x > 0)cmd.x = std::min(180, currentdeg.x + cmd.x);
+	else cmd.x = std::max(0, currentdeg.x + cmd.x);
+    if(cmd.y < 0)cmd.y = std::min(180, currentdeg.y - cmd.y);
+	else cmd.y = std::max(0, currentdeg.y - cmd.y);
 }
 
