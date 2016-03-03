@@ -173,7 +173,7 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
     //{
     //    cout << "saved prev img" << endl;
     //}
-#if 0
+#if 1
     static int z = 0;
     char name[50];
     sprintf(name, "img%d.jpg", z++);
