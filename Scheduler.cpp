@@ -217,11 +217,11 @@ void ServoController::Sense(void)
     cmdBuf->PopImgBuff(cmd);
     updatedegree(current_pos, cmd);
     printf("cmd --> x: %d y: %d\n", cmd.x, cmd.y);
-    //if(current_pos.x != cmd.x)
-    //{ 
-    //    Track360MtrCtrl_Pan(&actuator, cmd.x);
-    //    current_pos.x = cmd.x;
-    //}
+    if(current_pos.x != cmd.x)
+    { 
+        Track360MtrCtrl_Pan(&actuator, cmd.x);
+        current_pos.x = cmd.x;
+    }
     if(current_pos.y != cmd.y)
     { 
         Track360MtrCtrl_Tilt(&actuator, cmd.y);

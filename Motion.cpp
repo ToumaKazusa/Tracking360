@@ -173,6 +173,7 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
     //{
     //    cout << "saved prev img" << endl;
     //}
+#if 0
     static int z = 0;
     char name[50];
     sprintf(name, "img%d.jpg", z++);
@@ -184,6 +185,7 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
     //{
     //    cout << "saved cur img" << endl;
     //}
+#endif
     for(i = std::max(0, motion.ydir);i < std::min(Height, Height + motion.ydir);i ++)
 	{
 		for(j = std::max(0, motion.xdir);j < std::min(Width, Width + motion.xdir);j ++)
@@ -197,7 +199,7 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
 	//in Binary, 1 means this point have a large difference -> indicate moving object; 0 -> static background
 	//To be done: Image segmentation
 	int w = Width / 80;
-	int h = Height / 80;
+	int h = Height / 60;
 	int i1, j1, count, s = 0;
 	result.x = 0;
 	result.y = 0;
@@ -206,8 +208,8 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
 		for(j = 0;j < w;j ++)
 		{
 			count = 0;
-			for(i1 = 0;i1 < 80;i1 ++)for(j1 = 0;j1 < 80;j1 ++)if(Binary.at<uchar>(80 * i + i1, 80 * j + j1) > 0)count ++;
-			if(count > 2000)
+			for(i1 = 0;i1 < 60;i1 ++)for(j1 = 0;j1 < 80;j1 ++)if(Binary.at<uchar>(60 * i + i1, 80 * j + j1) > 0)count ++;
+			if(count > 1500)
 			{
 				result.x += j;
 				result.y += i;
@@ -217,7 +219,7 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
 	}
 	if(s > 0)result.x = 54 * result.x / (s * w) - 27;
     else result.x = 0;
-	if(s > 0)result.y = 30 * result.y / (s * h) - 15;
+	if(s > 0)result.y = 40 * result.y / (s * h) - 20;
 	else result.y = 0;
     cout << "Result:" << result.x << " "  << result.y << endl;
 }
