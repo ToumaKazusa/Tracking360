@@ -1,9 +1,7 @@
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
+//#include "opencv2/highgui/highgui.hpp"
+//#include "opencv2/imgproc/imgproc.hpp"
 #include <opencv2/opencv.hpp>
-
 #include <stdio.h>
-#include <opencv2/opencv.hpp>
 
 using namespace cv;
 using namespace std;
@@ -57,20 +55,20 @@ void Smoofimg (Mat M, int Range, int Width, int Height)
 			count = 0;
 			for(i1 = std::max(i - Range, 0); i1 < std::min(Width, i + Range); i1 ++)
 			{
-				for(j1 = std::max(j - Range, 0); i1 < std::min(Height, i + Range); j1 ++)
+				for(j1 = std::max(j - Range, 0); j1 < std::min(Height, j + Range); j1 ++)
 				{
 					count ++;
-					sum += temp.at<double>(i1, j1);
+					sum += temp.at<uchar>(j1, i1);
 				}
 			}
-			M.at<double>(i, j) = sum/count;
+			M.at<uchar>(j, i) = sum/count;
 		}
 	}
 	return;
 }
 
-direction Cameramotion (Mat Previmg, Mat Currimg, int Width, int Height){
-	double *sump, *sumc, *Pi, *Ci, *diff;
+direction Cameramotion (Mat& Previmg, Mat& Currimg, int Width, int Height){
+	double *sump, *sumc, *diff;
 	int i, j;
 	direction motion;
 	//Calculate x-motion of image 
@@ -82,18 +80,20 @@ direction Cameramotion (Mat Previmg, Mat Currimg, int Width, int Height){
 		sumc[i] = 0;
 		for(j = 0; j < Height; j++)
 		{
-			sump[i] += Previmg.at<double>(j, i);
-			sumc[i] += Currimg.at<double>(j, i);;
+			sump[i] += Previmg.at<uchar>(j, i);
+			sumc[i] += Currimg.at<uchar>(j, i);
 		}
+		sump[i] /= Height;
+		sumc[i] /= Height;
 	}
 	diff = new double[321];
 	//Assume moving is within [-160, 160]
 	//Smoof the difference and get delay
 	Smoof(sump, 10, Width);
 	Smoof(sumc, 10, Width);
-	for(i = -160;i < 160;i ++)
+	for(i = -160;i <= 160;i ++)
 	{
-		diff[i] = 0;
+		diff[i + 160] = 0;
 		for(j = 160;j < Width - 160;j ++)
 		{
 			diff[i + 160] += (sump[j] - sumc[j + i])*(sump[j] - sumc[j + i]);
@@ -118,30 +118,31 @@ direction Cameramotion (Mat Previmg, Mat Currimg, int Width, int Height){
 	sumc = new double[Height];
 	for(i = 0; i < Height; i++)
 	{	
-		Pi = Previmg.ptr<double>(i);
-		Ci = Currimg.ptr<double>(i);
 		sump[i] = 0;
 		sumc[i] = 0;
 		for(j = 0; j < Width; j++)
 		{
-			sump[i] += Pi[j];
-			sumc[i] += Ci[j];
+			sump[i] += Previmg.at<uchar>(i, j);
+			sumc[i] += Currimg.at<uchar>(i, j);
 		}
+		sump[i] /= Width;
+		sumc[i] /= Width;
 	}
-	delete[] diff;
+	//delete[] diff;
 	diff = new double[241];
 	//Assume moving is within [-120, 120]
 	//Smoof the difference and get delay
 	Smoof(sump, 10, Height);
 	Smoof(sumc, 10, Height);
-	for(i = -120;i < 120;i ++)
+	for(i = -120;i <= 120;i ++)
 	{
-		diff[i] = 0;
-		for(j = 120;j < Width - 120;j ++)
+		diff[i + 120] = 0;
+		for(j = 120;j < Height - 120;j ++)
 		{
 			diff[i + 120] += (sump[j] - sumc[j + i])*(sump[j] - sumc[j + i]);
 		}
 	}
+
 	min = diff[0];
 	pos = 0;
 	for(i = 1;i < 241;i ++)
@@ -152,6 +153,7 @@ direction Cameramotion (Mat Previmg, Mat Currimg, int Width, int Height){
 			pos = i;
 		}
 	}
+	for(i = 0;i < 120;i ++)cout << sump[i] << '\t' << sumc[i] << endl;
 	motion.ydir = pos - 120;
 	delete[] sump;
 	delete[] sumc;
@@ -159,28 +161,46 @@ direction Cameramotion (Mat Previmg, Mat Currimg, int Width, int Height){
 	return motion;	
 }
 
-degree Cameradegree (Mat& Previmg, Mat& Currimg, int Height, int Width){
+Mat Cameradegree (Mat& Previmg, Mat& Currimg, degree& result, int Width = 640, int Height = 480){
 	direction motion = Cameramotion(Previmg, Currimg, Width, Height);
-	Smoofimg(Previmg, 5, Width, Height);
-	Smoofimg(Currimg, 5, Width, Height);
+	cout << motion.xdir << ' ' << motion.ydir << endl;
+//	Smoofimg(Previmg, 5, Width, Height);
+//	Smoofimg(Currimg, 5, Width, Height);
 	int i, j;
-	int thershold = 20;
-	Mat Binary = Mat::zeros(100, 100, CV_8U);
+	int thershold = 30;
+	Mat Binary = Mat::zeros(Height, Width, CV_8U);
 	for(i = std::max(0, motion.ydir);i < std::min(Height, Height + motion.xdir);i ++)
 	{
 		for(j = std::max(0, motion.xdir);j < std::min(Width, Width + motion.xdir);j ++)
 		{
-			if(abs(Currimg.at<double>(i, j) - Previmg.at<double>(i - motion.ydir, j - motion.xdir)) < thershold)
-				Binary.at<int>(i, j) = 0;
-			else Binary.at<int>(i, j) = 1;	
+			if(abs(Currimg.at<uchar>(i, j) - Previmg.at<uchar>(i - motion.ydir, j - motion.xdir)) < thershold)
+				Binary.at<uchar>(i, j) = 0;
+			else Binary.at<uchar>(i, j) = Currimg.at<uchar>(i, j) - Previmg.at<uchar>(i - motion.ydir, j - motion.xdir);	
 		}
 	}
 	//Current function: Get motion vector<x, y> by Cameramotion, then thershold imagine into new mat Binary,
 	//in Binary, 1 means this point have a large difference -> indicate moving object; 0 -> static background
 	//To be done: Image segmentation
-	
-	degree result;
+	int w = Width / 80;
+	int h = Height / 80;
+	int i1, j1, count, s;
 	result.x = 0;
 	result.y = 0;
-	return result;
+	for(i = 0;i < h;i ++)
+	{
+		for(j = 0;j < w;j ++)
+		{
+			count = 0;
+			for(i1 = 0;i1 < 80;i1 ++)for(j1 = 0;j1 < 80;j1 ++)if(Binary.at<uchar>(80 * i + i1, 80 * j + j1) > 0)count ++;
+			if(count > 1000)
+			{
+				result.x += j;
+				result.y += i;
+				s ++;
+			}
+		}
+	}
+	result.x = 54 * result.x / (s * w) - 27;
+	result.y = 42 * result.y / (s * h) - 21;
+	return Binary;
 }
