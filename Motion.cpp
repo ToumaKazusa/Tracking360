@@ -204,3 +204,12 @@ Mat Cameradegree (Mat& Previmg, Mat& Currimg, degree& result, int Width = 640, i
 	result.y = 42 * result.y / (s * h) - 21;
 	return Binary;
 }
+
+void updatedegree(degree& currentdeg, degree cmd)
+{
+	if(cmd.x > 0)currentdeg.x = std::min(180, currentdeg.x + cmd.x);
+	else currentdeg.x = std::max(0, currentdeg.x + cmd.x);
+	if(cmd.y > 0)currentdeg.y = std::min(180, currentdeg.y + cmd.y);
+	else currentdeg.y = std::max(0, currentdeg.y + cmd.y);
+}
+
