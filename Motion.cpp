@@ -198,8 +198,8 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
 	//Current function: Get motion vector<x, y> by Cameramotion, then thershold imagine into new mat Binary,
 	//in Binary, 1 means this point have a large difference -> indicate moving object; 0 -> static background
 	//To be done: Image segmentation
-	int w = Width / 80;
-	int h = Height / 60;
+	int w = Width / 32;
+	int h = Height / 24;
 	int i1, j1, count, s = 0;
 	result.x = 0;
 	result.y = 0;
@@ -208,8 +208,8 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
 		for(j = 0;j < w;j ++)
 		{
 			count = 0;
-			for(i1 = 0;i1 < 60;i1 ++)for(j1 = 0;j1 < 80;j1 ++)if(Binary.at<uchar>(60 * i + i1, 80 * j + j1) > 0)count ++;
-			if(count > 1500)
+			for(i1 = 0;i1 < 24;i1 ++)for(j1 = 0;j1 < 32;j1 ++)if(Binary.at<uchar>(24 * i + i1, 32 * j + j1) > 0)count ++;
+			if(count > 150)
 			{
 				result.x += j;
 				result.y += i;
@@ -217,11 +217,16 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
 			}
 		}
 	}
+	if(s > 100) 
+	{
+		result.x = result.y = 0;
+		return;
+	}
 	if(s > 0)result.x = 54 * result.x / (s * w) - 27;
-    else result.x = 0;
+    	else result.x = 0;
 	if(s > 0)result.y = 40 * result.y / (s * h) - 20;
 	else result.y = 0;
-    cout << "Result:" << result.x << " "  << result.y << endl;
+	cout << "Result:" << result.x << " "  << result.y << endl;
 }
 
 void updatedegree(struct degree& currentdeg, struct degree& cmd)
