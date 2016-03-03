@@ -4,11 +4,13 @@
 #include "PCA9685Driver.h"
 
 #define DEBUG_360 true
+#define SKIPFRAMECNTS 1
 
 using namespace cv;
 using namespace std;
 
 bool ProgramExit = false;
+
 template<class T>
 class ImgBuf
 {
@@ -115,7 +117,7 @@ class ImgProducer
         VideoCapture picam;
         Mat buffImg;
         bool bInit;
-
+        int skipcnts, imgcaptured;
 };
 
 ImgProducer::ImgProducer(ImgBuf<Mat>* buf):picam(0)
@@ -130,19 +132,27 @@ ImgProducer::ImgProducer(ImgBuf<Mat>* buf):picam(0)
 
     ImgBuffs = buf;
     bInit = true;
+    skipcnts = SKIPFRAMECNTS;  
+    imgcaptured = 0;
+
 }
 
 bool ImgProducer::Produce()
 {
     // read a new frame from video
-    if(false == picam.read(buffImg))
+    if(imgcaptured == 0)
     {
-         cout << "Cannot read a frame from video stream" << endl;
-         return false;
+        if(false == picam.read(buffImg))
+        {
+             cout << "Cannot read a frame from video stream" << endl;
+             return false;
+        }
+        Mat imgBGR2GRAY;
+        cvtColor(buffImg, imgBGR2GRAY, COLOR_BGR2GRAY);
+        ImgBuffs->PushImgBuff(imgBGR2GRAY);
     }
-    Mat imgBGR2GRAY;
-    cvtColor(buffImg, imgBGR2GRAY, COLOR_BGR2GRAY);
-    ImgBuffs->PushImgBuff(imgBGR2GRAY);
+    ++imgcaptured;
+    imgcaptured %= skipcnts;
     return true;
 }
 
@@ -231,12 +241,12 @@ void ServoController::Sense(void)
 
 void* consumer(void* arg)
 {
-    static int i = 0;
+    //static int i = 0;
     ImageProcessor* imgProc = (ImageProcessor* ) arg;
-    while(!ProgramExit && i != 1000)
+    while(!ProgramExit)// && i != 1000)
     {
         imgProc->Process();
-        i++;
+        //i++;
     }
 
     ProgramExit = true;
