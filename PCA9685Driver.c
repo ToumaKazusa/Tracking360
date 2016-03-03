@@ -224,6 +224,7 @@ void Track360MtrCtrl_Init(struct Track360MotorControlType* self)
 
 int Track360MtrCtrl_DegToTck(struct Track360MotorControlType* self, int degree)
 {
+    printf("degree --> %d at %d in %s\n", degree, __LINE__, __FUNCTION__);
     int tick = (int) (self->PWTckPerDeg* degree) + self->MinPWTck;
     if(self->bDebug)
         printf("value written = %d\n", tick);

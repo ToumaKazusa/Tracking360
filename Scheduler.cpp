@@ -13,7 +13,7 @@ template<class T>
 class ImgBuf
 {
     enum {
-        max_buff_size = 5,
+        max_buff_size = 20,
     };
     public:
         bool PushImgBuff(T& buff);
@@ -140,8 +140,9 @@ bool ImgProducer::Produce()
          cout << "Cannot read a frame from video stream" << endl;
          return false;
     }
-
-    ImgBuffs->PushImgBuff(buffImg);
+    Mat imgBGR2GRAY;
+    cvtColor(buffImg, imgBGR2GRAY, COLOR_BGR2GRAY);
+    ImgBuffs->PushImgBuff(imgBGR2GRAY);
     return true;
 }
 
@@ -152,7 +153,6 @@ void* producer(void* arg)
     while(!ProgramExit)
     {
         producer->Produce();
-        printf("produce .. at %d in %s\n", __LINE__, __FUNCTION__);
     }
     pthread_exit(NULL);
 }
@@ -184,6 +184,8 @@ void ImageProcessor::Process()
         Cameradegree (prevImg, curImg, result);
     prevImg = curImg.clone(); 
     bPrevImgPresent = true;
+    printf("x --> %d, y --> %d at %d in %s", result.x, result.y, __LINE__, __FUNCTION__);
+
     _cmdBuf->PushImgBuff(result);
 }
 
@@ -202,7 +204,8 @@ class ServoController
 ServoController::ServoController(ImgBuf<struct degree>* buf)
 {
     cmdBuf = buf;
-    current_pos.x = current_pos.y = 90;
+    current_pos.x = 90;
+    current_pos.y = 90;
     Track360MtrCtrl_Init(&actuator);
     Track360MtrCtrl_Pan(&actuator, current_pos.x);
     Track360MtrCtrl_Tilt(&actuator, current_pos.y);
@@ -212,14 +215,16 @@ void ServoController::Sense(void)
 {
     struct degree cmd;
     cmdBuf->PopImgBuff(cmd);
-    if(current_pos.x != cmd.x)
-    { 
-        Track360MtrCtrl_Pan(&actuator, cmd.y);
-        current_pos.x = cmd.x;
-    }
+    updatedegree(current_pos, cmd);
+    printf("cmd --> x: %d y: %d\n", cmd.x, cmd.y);
+    //if(current_pos.x != cmd.x)
+    //{ 
+    //    Track360MtrCtrl_Pan(&actuator, cmd.x);
+    //    current_pos.x = cmd.x;
+    //}
     if(current_pos.y != cmd.y)
     { 
-        Track360MtrCtrl_Tilt(&actuator, cmd.x);
+        Track360MtrCtrl_Tilt(&actuator, cmd.y);
         current_pos.y = cmd.y;
     }
 }

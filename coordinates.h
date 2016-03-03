@@ -8,6 +8,8 @@ struct degree{
 	int y;
 };
 
-Mat Cameradegree (Mat& Previmg, Mat& Currimg, struct degree& result, 
+void Cameradegree (Mat& Previmg, Mat& Currimg, struct degree& result, 
         int Width = 640, int Height = 480);
+
+void updatedegree(struct degree& currentdeg, struct degree& cmd);
 #endif
