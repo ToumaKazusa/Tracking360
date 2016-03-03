@@ -4,7 +4,7 @@
 #include "PCA9685Driver.h"
 
 #define DEBUG_360 true
-#define SKIPFRAMECNTS 2
+#define SKIPFRAMECNTS 1
 
 using namespace cv;
 using namespace std;

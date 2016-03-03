@@ -224,9 +224,9 @@ void Cameradegree (Mat& Previmg, Mat& Currimg,
 		result.x = result.y = 0;
 		return;
 	}
-	if(s > 0)result.x = 54 * result.x / (sj * w) - 27;
+	if(sj > 0)result.x = 54 * result.x / (sj * w) - 27;
     	else result.x = 0;
-	if(s > 0)result.y = 40 * result.y / (si * h) - 20;
+	if(si > 0)result.y = 40 * result.y / (si * h) - 20;
 	else result.y = 0;
 	cout << "Result:" << result.x << " "  << result.y << endl;
 }
