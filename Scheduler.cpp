@@ -195,8 +195,10 @@ class ServoController
 ServoController::ServoController(ImgBuf<struct degree>* buf)
 {
     cmdBuf = buf;
-    current_pos.x = current_pos.y = 0;
+    current_pos.x = current_pos.y = 90;
     Track360MtrCtrl_Init(&actuator);
+    Track360MtrCtrl_Pan(&actuator, current_pos.x);
+    Track360MtrCtrl_Tilt(&actuator, current_pos.y);
 }
 
 void ServoController::Sense(void)
@@ -251,7 +253,6 @@ int main( int argc, char** argv )
     ImgBuf<struct degree> cmdBuf(&cmd_lock, &cmd_ready_cond);
     ImgProducer imgProducer(&buf);
     ServoController controller(&cmdBuf);
-
     pthread_create(&threads[0], NULL, producer, static_cast<void*>(&imgProducer)); 
     pthread_create(&threads[1], NULL, consumer, static_cast<void*>(&buf)); 
     pthread_create(&threads[2], NULL, actuate,  static_cast<void*>(&cmdBuf)); 
