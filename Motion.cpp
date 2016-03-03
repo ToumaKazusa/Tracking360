@@ -14,8 +14,8 @@ struct direction{
 };
 
 struct degree{
-	float vt;
-	float hr;
+	int x;
+	int y;
 };
 
 //Smoof a continus array
@@ -159,7 +159,7 @@ direction Cameramotion (Mat Previmg, Mat Currimg, int Width, int Height){
 	return motion;	
 }
 
-degree Cameradegree (Mat Previmg, Mat Currimg, int Height, int Width){
+degree Cameradegree (Mat& Previmg, Mat& Currimg, int Height, int Width){
 	direction motion = Cameramotion(Previmg, Currimg, Width, Height);
 	Smoofimg(Previmg, 5, Width, Height);
 	Smoofimg(Currimg, 5, Width, Height);
@@ -180,7 +180,7 @@ degree Cameradegree (Mat Previmg, Mat Currimg, int Height, int Width){
 	//To be done: Image segmentation
 	
 	degree result;
-	result.vt = 0;
-	result.hr = 0;
+	result.x = 0;
+	result.y = 0;
 	return result;
 }
